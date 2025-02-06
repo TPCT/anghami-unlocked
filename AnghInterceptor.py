@@ -1,12 +1,12 @@
 from utils import Utils
-import hashlib
-import base64
 import gzip
-import os
 import time
-import uuid
 from urllib import parse
 from nacl.bindings import crypto_aead_chacha20poly1305_decrypt
+import uuid
+import random
+import string
+
 
 class AnghInterceptor:
     USER_AGENT = "Anghami Android 7.0.85 / V 13 (7000850) Google store"
@@ -17,8 +17,8 @@ class AnghInterceptor:
     DEVICE_ENCRYPTION_ARRAY = bytes([x if x >= 0 else x + 256 for x in [35, -55, -117, 18, -55, 82, 22, -23, 54, 39, 95, 3, -40, -36, 91, -60, 33, 40, -63, -34, 42, -125, 76, -61]])
 
     def __init__(self):
-        self._install_id = "22ceed33-24df-4873-9ae2-1bea0a1d11a0" # uuid.uuid4()
-        self._device_id = "866380ea74c355e1" #"".join(random.choices(string.ascii_lowercase + string.digits, k=16))
+        self._install_id = uuid.uuid4()
+        self._device_id ="".join(random.choices(string.ascii_lowercase + string.digits, k=16))
 
     def generateToken(self, time_millis, convert):
         k10 = Utils.convert_device_id_to_integer(self._device_id) % (7 if convert else 13)
@@ -34,7 +34,7 @@ class AnghInterceptor:
         return gzip.decompress(crypto_aead_chacha20poly1305_decrypt(encrypted_payload[22:], additional_data, nonce, key)).decode()
 
     def intercept(self, url, headers, body):
-        current_time = 1732326915 # int(time.time())
+        current_time = int(time.time())
         gzipped_body = gzip.compress(body) if body else None
         encryption_token = self.generateToken(current_time, True)
         decryption_token = self.generateToken(current_time, False)
@@ -56,8 +56,8 @@ class AnghInterceptor:
             path_url = path_url[index:].strip()
 
         payload_signature = Utils.concatenate_and_sign(path_url.encode(), encrypted_payload or bytearray())
-        salt = self.SALT # str(uuid.uuid4())
-        # headers["X-ANGH-RGSIG"] = Utils.hash_sha1(payload_signature)
+        salt = self.SALT
+        headers["X-ANGH-RGSIG"] = Utils.hash_sha1(payload_signature)
         headers["X-ANGH-APP-RGSIG"] = Utils.hash_with_salt(self.SIGN, payload_signature)
         headers["X-ANGH-APP-SALT"] = salt
 

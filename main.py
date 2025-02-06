@@ -8,9 +8,48 @@ from AnghInterceptor import AnghInterceptor
 from json import loads
 from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
-
+import uuid
+from requests import post
 
 filterwarnings("ignore")
+
+print(r"""
+
+   _____                 .__                   .__  _________ .____                         
+  /  _  \   ____    ____ |  |__ _____    _____ |__| \_   ___ \|    |   _____  ______  ______
+ /  /_\  \ /    \  / ___\|  |  \\__  \  /     \|  | /    \  \/|    |   \__  \ \____ \/  ___/
+/    |    \   |  \/ /_/  >   Y  \/ __ \|  Y Y  \  | \     \___|    |___ / __ \|  |_> >___ \ 
+\____|__  /___|  /\___  /|___|  (____  /__|_|  /__|  \______  /_______ (____  /   __/____  >
+        \/     \//_____/      \/     \/      \/             \/        \/    \/|__|       \/ 
+
+    DEV: TPCT
+    FACEBOOK: https://www.facebook.com/taylor.ackerley.9/
+    MOBILE: +201062905126
+""")
+
+APPLICATION_NAME = "angahmi claps".upper()
+APPLICATION_VERSION = "1"
+USERNAME = "MINA NEMR"
+mac_address = uuid.getnode()
+mac_address_hex = ':'.join(['{:02x}'.format((mac_address >> elements) & 0xff) for elements in range(0, 8 * 6, 8)][::-1])
+
+domain = "https://licence.shiftcodes.net"
+
+post(f'{domain}/api/v1/add_application', data={
+    'username': USERNAME,
+    'application_name': APPLICATION_NAME,
+    'application_version': APPLICATION_VERSION,
+    'server_mac_address': mac_address_hex
+})
+
+if post(f'{domain}/api/v1/check_verification', data={
+    'username': USERNAME,
+    'application_name': APPLICATION_NAME,
+    'application_version': APPLICATION_VERSION,
+    'server_mac_address': mac_address
+}).status_code != 200:
+    input("Contact Developer")
+    exit(0)
 
 def log(*args, **kwargs):
     with lock:

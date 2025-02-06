@@ -1,8 +1,6 @@
 import hashlib
 import os
 from nacl.bindings import crypto_aead_chacha20poly1305_encrypt
-import base64
-
 
 class Utils:
     @staticmethod
@@ -52,17 +50,10 @@ class Utils:
     @staticmethod
     def hash_with_salt(sign, data):
         try:
-            # message_digest = hashlib.sha1(sign_byte_array).digest()
             message_digest_2 = hashlib.sha256()
             message_digest_2.update(sign)
             message_digest_2.update(data)
             return message_digest_2.hexdigest()
-            # # sha = hashlib.sha256()
-            # # sha.update(
-            # #     base64.b64encode(hashlib.sha1(sign_byte_array).digest()) + salt.encode()
-            # # )
-            # # sha.update(data)
-            # return sha.hexdigest()
         except Exception:
             return ""
 
